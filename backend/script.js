@@ -1,6 +1,6 @@
 // Produção (site HTTPS): "wss://SEU_BACKEND/?from=site"
 // Dev local:             "ws://localhost:8080/?from=site"
-const ENDERECO_WS = "wss://ericka-unraisable-harrison.ngrok-free.dev/?from=site"
+const ENDERECO_WS = "wss://site-backend-iota.vercel.app/?from=site"
 
 // Elementos da UI que precisam ser atualizados pelo backend
 const statusBracelete = document.getElementById("status-bracelete")
