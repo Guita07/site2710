@@ -118,8 +118,8 @@ function confirmarFinalizacao() {
     enviarComando({ acao: "finalizar_rota" })
     
     // Lógica de UI (simulação)
-    alert("Comando de Finalização Enviado. Aguardando confirmação do servidor.")
-    // fecharPopup("popup-finalizar") - O fechamento deve ser feito após a confirmação do backend
+    alert("Rota finalizada e salva com sucesso!")
+    fecharPopup("popup-finalizar")
 }
 
 // A função conectar() é chamada no final do arquivo
@@ -164,3 +164,4 @@ conectar()
 // Vamos assumir que o usuário fará as alterações de ID no index.html.
 // Se o usuário não fizer, o script.js não funcionará corretamente.
 // O ideal é que eu faça as alterações no index.html também.
+

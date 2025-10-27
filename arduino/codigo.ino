@@ -1,6 +1,6 @@
 #include <WiFi.h>
 #include <WebSocketsClient.h>
-#include <ArduinoJson.h>  // Usado para montar e parsear JSON
+#include <ArduinoJson.h>  // usado aqui só pra montar o JSON de telemetria
 
 // ============================
 // Rede e servidor
@@ -14,7 +14,7 @@ const uint16_t PORTA_WS = 8080;
 const char* CAMINHO_WS  = "/?from=esp";
 
 // ============================
-// Telemetria (Rota)
+// Telemetria (exemplo)
 // ============================
 const unsigned long INTERVALO_TELEMETRIA_MS = 1500;
 
@@ -23,60 +23,6 @@ const unsigned long INTERVALO_TELEMETRIA_MS = 1500;
 // ============================
 WebSocketsClient clienteWs;
 unsigned long instanteUltimoEnvio = 0;
-bool rotaEmAndamento = false;
-
-// Simulação de dados de rota
-float distancia = 0.0;
-float velocidade = 0.0;
-float latitude = -23.6664;
-float longitude = -46.7831;
-const char* localizacao = "Unasp - SP";
-
-// Simulação de status dos dispositivos
-bool braceleteConectado = true;
-bool oculosConectado = false;
-
-// ============================
-// Funções de Comunicação
-// ============================
-
-void enviarTelemetria() {
-  if (!clienteWs.isConnected()) return;
-
-  // Monta JSON de telemetria
-  StaticJsonDocument<256> doc;
-  
-  // Status dos dispositivos
-  doc["bracelete"] = braceleteConectado;
-  doc["oculos"] = oculosConectado;
-  
-  // Dados da rota
-  doc["distancia"] = distancia;
-  doc["velocidade"] = velocidade;
-  doc["localizacao"] = localizacao;
-  doc["latitude"] = latitude;
-  doc["longitude"] = longitude;
-
-  // Serializa e envia
-  char buffer[256];
-  size_t n = serializeJson(doc, buffer, sizeof(buffer));
-  clienteWs.sendTXT(buffer, n);
-}
-
-void simularDadosRota() {
-  if (rotaEmAndamento) {
-    // Simula o aumento da distância e velocidade
-    distancia += 0.05; // 50 metros a cada 1.5s
-    velocidade = 15.0 + (random(-20, 21) / 10.0); // Velocidade entre 13 e 17 km/h
-    
-    // Simula uma pequena mudança de localização
-    latitude += (random(-1, 2) / 10000.0);
-    longitude += (random(-1, 2) / 10000.0);
-  } else {
-    // Quando a rota não está em andamento, a velocidade é zero
-    velocidade = 0.0;
-  }
-}
 
 // ============================
 // Eventos do WebSocket
@@ -85,32 +31,13 @@ void aoReceberEventoWs(WStype_t tipo, uint8_t* dados, size_t tamanho) {
   switch (tipo) {
     case WStype_CONNECTED:
       Serial.println("[WS] Conectado");
-      // Envia o estado inicial dos dispositivos assim que conectar
-      enviarTelemetria(); 
       break;
     case WStype_DISCONNECTED:
       Serial.println("[WS] Desconectado");
       break;
     case WStype_TEXT:
+      // 👉 Apenas imprime no Serial TUDO que chegar do frontend (texto ou JSON)
       Serial.printf("[WS] Mensagem do front: %.*s\n", (int)tamanho, dados);
-      
-      // Processa o comando JSON do frontend
-      StaticJsonDocument<128> doc;
-      DeserializationError erro = deserializeJson(doc, (const char*)dados);
-      
-      if (!erro) {
-        const char* acao = doc["acao"];
-        if (acao) {
-          if (strcmp(acao, "iniciar_rota") == 0) {
-            rotaEmAndamento = true;
-            distancia = 0.0; // Reinicia a distância
-            Serial.println("[AÇÃO] Rota Iniciada");
-          } else if (strcmp(acao, "finalizar_rota") == 0) {
-            rotaEmAndamento = false;
-            Serial.println("[AÇÃO] Rota Finalizada");
-          }
-        }
-      }
       break;
     default:
       break;
@@ -146,15 +73,27 @@ void setup() {
 void loop() {
   clienteWs.loop();
 
-  // Envia telemetria
+  // Exemplo: envia telemetria fake a cada 1,5s (pode remover se não quiser enviar nada)
   const unsigned long agora = millis();
   const bool deveEnviar = clienteWs.isConnected() &&
                           (agora - instanteUltimoEnvio > INTERVALO_TELEMETRIA_MS);
 
   if (deveEnviar) {
     instanteUltimoEnvio = agora;
-    simularDadosRota();
-    enviarTelemetria();
+
+    // Simula sensores
+    const float temperatura = 24.7 + (random(-5, 6) * 0.1);
+    const float umidade    = 58.0 + (random(-10, 11) * 0.1);
+
+    // Monta JSON de telemetria
+    StaticJsonDocument<192> doc;
+    doc["temperatura"] = temperatura;
+    doc["umidade"]     = umidade;
+    doc["timestamp"]   = agora;
+
+    // Serializa e envia
+    char buffer[192];
+    size_t n = serializeJson(doc, buffer, sizeof(buffer));
+    clienteWs.sendTXT(buffer, n);
   }
 }
-

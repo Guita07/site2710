@@ -415,7 +415,7 @@
           <span>[ Simulação do Mapa ]</span>
         </div>
         <div class="botoes-popup-container">
-          <button class="botao-do-popup" onclick="fecharPopup('popup-atual')">
+          <button class="botao-do-popup" onclick="pararCronometro(); fecharPopup('popup-atual')">
             Fechar
           </button>
         </div>
@@ -432,7 +432,7 @@
 
         popup.style.display = "flex"
         if (id === "popup-atual") {
-          iniciarCronometro()
+
         }
       }
 
@@ -446,30 +446,9 @@
         }
       }
 
-      function confirmarFinalizacao() {
-        alert("Rota finalizada e salva com sucesso!")
-        fecharPopup("popup-finalizar")
-      }
+      
 
-      function iniciarCronometro() {
-        if (cronometroInterval) return
-
-        cronometroInterval = setInterval(() => {
-          segundosDecorridos++
-          const h = Math.floor(segundosDecorridos / 3600)
-          const m = Math.floor((segundosDecorridos % 3600) / 60)
-          const s = segundosDecorridos % 60
-
-          const tempoFormatado = [h, m, s]
-            .map((v) => String(v).padStart(2, "0"))
-            .join(":")
-
-          const tempoElement = document.getElementById("tempo-rota")
-          if (tempoElement) {
-            tempoElement.textContent = tempoFormatado
-          }
-        }, 1000)
-      }
+      
 
       function pararCronometro() {
         clearInterval(cronometroInterval)
