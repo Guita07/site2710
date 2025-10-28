@@ -415,55 +415,13 @@
           <span>[ Simulação do Mapa ]</span>
         </div>
         <div class="botoes-popup-container">
-          <button class="botao-do-popup" onclick="pararCronometro(); fecharPopup('popup-atual')">
+          <button class="botao-do-popup" onclick="fecharPopup('popup-atual')">
             Fechar
           </button>
         </div>
       </div>
     </div>
 
-    <script>
-      let cronometroInterval
-      let segundosDecorridos = 0
-
-      function abrirPopup(id) {
-        const popup = document.getElementById(id)
-        if (!popup) return
-
-        popup.style.display = "flex"
-        if (id === "popup-atual") {
-
-        }
-      }
-
-      function fecharPopup(id) {
-        const popup = document.getElementById(id)
-        if (!popup) return
-
-        popup.style.display = "none"
-        if (id === "popup-atual") {
-          pararCronometro()
-        }
-      }
-
-      
-
-      
-
-      function pararCronometro() {
-        clearInterval(cronometroInterval)
-        cronometroInterval = null
-      }
-
-      document.addEventListener("click", (evento) => {
-        if (evento.target.classList.contains("fundo-escuro-popup")) {
-          fecharPopup(evento.target.id)
-        }
-      })
-
-      document.querySelectorAll(".janela-popup").forEach((popup) => {
-        popup.addEventListener("click", (evento) => evento.stopPropagation())
-      })
-    </script>
+    <script src="script.js" defer></script>
   </body>
 </html>
